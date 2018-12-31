@@ -1,0 +1,20 @@
+$Conf{BackupFilesExclude} = {
+  '*' => [
+    '/home/*'
+  ]
+};
+$Conf{CompressLevel} = 6;
+$Conf{DumpPostUserCmd} = '/bin/echo PostUser';
+$Conf{DumpPreUserCmd} = '/bin/echo PreUser';
+$Conf{BackupFilesOnly} = {
+  '*' => [
+    ''
+  ]
+};
+$Conf{XferMethod} = 'rsync';
+$Conf{RsyncClientCmd} = '$sshPath -q -x -l makky $host $rsyncPath $argList+';
+$Conf{RsyncShareName} = [
+  '/tmp',
+  '/var/tmp'
+];
+$Conf{XferLogLevel} = 2;

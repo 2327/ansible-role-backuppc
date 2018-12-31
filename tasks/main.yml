@@ -1,0 +1,54 @@
+---      
+
+- name: Clean hosts directory 
+  file:
+    state: absent
+    path: '{{ backuppc.base_path }}/config/hosts'
+
+- name: Clean jobs directory 
+  file:
+    state: absent
+    path: '{{ backuppc.base_path }}/config/pc'
+
+- name: Creates jobs directory
+  file:
+    path: '{{ backuppc.base_path }}/config/pc'
+    state: directory
+
+- name: Create config
+  template:
+    src: 'config.pl.j2'
+    dest: '{{ backuppc.base_path }}/config/config.pl'
+
+- name: Create hosts
+  template:
+    src: 'hosts.j2'
+    dest: '{{ backuppc.base_path }}/config/hosts'
+
+- name: Create jobs for hosts
+  template:
+    src: 'jobs.j2'
+    dest: '{{ backuppc.base_path }}/config/pc/{{ item.host }}.pl'
+  loop: '{{ backuppc.hosts|flatten(levels=1) }}'
+
+- name: Install BackupPC rhel way
+  import_tasks: install.yml
+  when: (ansible_distribution == 'CentOS') or 
+        (ansible_distribution == 'Red Hat Enterprise Linux')" and
+        (backuppc.docker is false)
+
+- name: Start BackupPC docker way
+  docker_container:
+    name: BackupPC
+    image: '{{ backuppc.docker_image }}:{{ backuppc.docker_images_tag }}'
+    state: started
+    detach: true    
+    recreate: yes
+    ports:
+      - '{{ backuppc.docker_port }}:80'
+    volumes:
+      - '{{ backuppc.base_path }}/config:/etc/BackupPC:rw'
+      - '{{ backuppc.base_path }}/data:/var/lib/BackupPC:rw'
+  when: backuppc.docker == true
+
+
