@@ -10,6 +10,11 @@
     state: absent
     path: '{{ backuppc.base_path }}/config/pc'
 
+- name: Clean status 
+  file:
+    state: absent
+    path: '{{ backuppc.base_path }}/data/log/status.pl*'
+
 - name: Creates jobs directory
   file:
     path: '{{ backuppc.base_path }}/config/pc'
@@ -50,5 +55,3 @@
       - '{{ backuppc.base_path }}/config:/etc/BackupPC:rw'
       - '{{ backuppc.base_path }}/data:/var/lib/BackupPC:rw'
   when: backuppc.docker == true
-
-

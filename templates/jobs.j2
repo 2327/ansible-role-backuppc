@@ -1,20 +1,23 @@
-$Conf{BackupFilesExclude} = {
-  '*' => [
-    '/home/*'
-  ]
-};
-$Conf{CompressLevel} = 6;
-$Conf{DumpPostUserCmd} = '/bin/echo PostUser';
+$Conf{XferLogLevel} = 1;
+{% if item.compress_level is defined %}
+$Conf{CompressLevel} = {{ item.compress_level }};
+{% endif %}
+{% if item.dumppreusercmd is defined %}
 $Conf{DumpPreUserCmd} = '/bin/echo PreUser';
-$Conf{BackupFilesOnly} = {
-  '*' => [
-    ''
-  ]
-};
+{% endif %}
+{% if item.dumppostusercmd is defined %}
+$Conf{DumpPostUserCmd} = '/bin/echo PostUser';
+{% endif %}
+{% if item.xfer_method is defined and item.xfer_method == 'rsync' %}
 $Conf{XferMethod} = 'rsync';
+{% endif %}
+{% if item.rsyncclientcmd is defined %}
 $Conf{RsyncClientCmd} = '$sshPath -q -x -l makky $host $rsyncPath $argList+';
+{% endif %}
+{% if item.rsyncsharename is defined %}
 $Conf{RsyncShareName} = [
-  '/tmp',
-  '/var/tmp'
+{% for share in item.rsyncsharename %}
+  '{{ share }}',
+{% endfor %}
 ];
-$Conf{XferLogLevel} = 2;
+{% endif %}
